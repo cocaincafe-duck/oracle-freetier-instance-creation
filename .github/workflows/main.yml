@@ -21,19 +21,19 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Create OCI Config Files
+      - name: Inject Secrets into oci.env
         run: |
-          # Tạo file chứa Private Key bí mật
+          # Ghi đè file Private Key
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > oci_api_private_key.pem
           chmod 600 oci_api_private_key.pem
           
-          # Tự động tạo file oci_config theo đúng mẫu của dự án
-          echo "[DEFAULT]" > oci_config
-          echo "user=${{ secrets.OCI_USER_OCID }}" >> oci_config
-          echo "fingerprint=${{ secrets.OCI_FINGERPRINT }}" >> oci_config
-          echo "tenancy=${{ secrets.OCI_TENANCY_OCID }}" >> oci_config
-          echo "region=${{ secrets.OCI_REGION }}" >> oci_config
-          echo "key_file=$(pwd)/oci_api_private_key.pem" >> oci_config
+          # Nối thêm các thông số API bí mật vào cuối file oci.env có sẵn của bạn
+          echo "" >> oci.env
+          echo "OCI_USER_OCID=${{ secrets.OCI_USER_OCID }}" >> oci.env
+          echo "OCI_TENANCY_OCID=${{ secrets.OCI_TENANCY_OCID }}" >> oci.env
+          echo "OCI_FINGERPRINT=${{ secrets.OCI_FINGERPRINT }}" >> oci.env
+          echo "OCI_REGION=${{ secrets.OCI_REGION }}" >> oci.env
+          echo "OCI_KEY_FILE=$(pwd)/oci_api_private_key.pem" >> oci.env
 
       - name: Run Hunter Bot
         run: |
