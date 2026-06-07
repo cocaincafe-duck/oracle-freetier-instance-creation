@@ -21,16 +21,20 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Setup Key File
+      - name: Setup OCI Credentials
         run: |
+          # 1. Tạo file Private Key bí mật
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > oci_api_private_key.pem
           chmod 600 oci_api_private_key.pem
+          
+          # 2. Tạo đúng file oci_config mà hệ thống đang đòi
+          echo "[DEFAULT]" > oci_config
+          echo "user=${{ secrets.OCI_USER_OCID }}" >> oci_config
+          echo "fingerprint=${{ secrets.OCI_FINGERPRINT }}" >> oci_config
+          echo "tenancy=${{ secrets.OCI_TENANCY_OCID }}" >> oci_config
+          echo "region=${{ secrets.OCI_REGION }}" >> oci_config
+          echo "key_file=$(pwd)/oci_api_private_key.pem" >> oci_config
 
       - name: Run Hunter Bot
-        env:
-          OCI_USER_OCID: ${{ secrets.OCI_USER_OCID }}
-          OCI_TENANCY_OCID: ${{ secrets.OCI_TENANCY_OCID }}
-          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
-          OCI_REGION: ${{ secrets.OCI_REGION }}
         run: |
           python main.py
