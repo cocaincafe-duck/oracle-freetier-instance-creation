@@ -40,4 +40,4 @@ jobs:
 
       - name: Run Hunter Bot
         run: |
-          python main.py
+          python -u main.py
